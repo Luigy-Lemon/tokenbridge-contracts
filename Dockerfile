@@ -1,4 +1,4 @@
-FROM node:10 as contracts
+FROM node:10-buster as contracts
 
 WORKDIR /contracts
 
@@ -13,7 +13,7 @@ RUN npm run compile
 COPY flatten.sh flatten.sh
 RUN bash flatten.sh
 
-FROM node:10
+FROM node:10-buster
 
 WORKDIR /contracts
 COPY --from=contracts /contracts/build ./build
