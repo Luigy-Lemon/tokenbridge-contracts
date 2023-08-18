@@ -57,11 +57,8 @@ contract SetupTest is Test {
 
         deal(address(dai), bob, 10000e18);
         assertEq(dai.balanceOf(bob), 10000e18);
-
-        /*//////////////////////////////////////////////////////////////
-                                DEPLOYMENTS
-        //////////////////////////////////////////////////////////////*/
-
+        
+        // upgrading implementation
         testUpgrade();
 
     }
