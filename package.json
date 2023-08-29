@@ -17,7 +17,8 @@
     "watch-tests": "./node_modules/.bin/nodemon ./node_modules/.bin/truffle test --network test",
     "coverage": "SOLIDITY_COVERAGE=true npm run test",
     "foundry-test": "./test/foundry/foundrySetup.sh",
-    "foundry-fork": "./test/foundry/forkSetup.sh"
+    "foundry-fork": "./test/foundry/forkSetup.sh",
+    "deploy": "./deploy.sh"
   },
   "author": "POA network",
   "license": "GPLv3",

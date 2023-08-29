@@ -1,38 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+source .env
+JSON_OUTPUT=$(forge create --rpc-url $RPC_GOERLI --private-key $PRIVATE_KEY --json --optimize XDaiForeignBridge)
 
-if [ -f /.dockerenv ]; then
-  # the script is run within the container
-  cd deploy
+DEPLOYED_TO=$(jq -r '.deployedTo' <<< "$JSON_OUTPUT")
 
-  if [ "$1" == "token" ]; then
-    echo "Deployment of token for testing environment started"
-    node testenv-deploy.js token
-  else
-    echo "Bridge contract deployment started"
-    npm run deploy
-    if [ -f bridgeDeploymentResults.json ]; then
-      cat bridgeDeploymentResults.json
-      echo
-    fi
-  fi
-  exit 0
-fi
+# Update the NEW_IMPLEMENTATION variable in the .env file with the value of DEPLOYED_TO 
+# Requires .env and variable to already be declared!
+sed -i "s/^NEW_IMPLEMENTATION=.*/NEW_IMPLEMENTATION=$DEPLOYED_TO/" .env
 
-which docker-compose > /dev/null
-if [ "$?" == "1" ]; then
-  echo "docker-compose is needed to use this type of deployment"
-  exit 1
-fi
+forge test --fork-url $RPC_GOERLI -vvv
 
-if [ ! -f ./deploy/.env ]; then
-  echo "The .env file not found in the 'deploy' directory"
-  exit 3
-fi
-
-docker-compose images bridge-contracts >/dev/null 2>/dev/null
-if [ "$?" == "1" ]; then
-  echo "Docker image 'bridge-contracts' not found"
-  exit 2
-fi
-
-docker-compose run bridge-contracts deploy.sh "$@"
+forge verify-contract --chain goerli $NEW_IMPLEMENTATION XDaiForeignBridge
+#forge snapshot --fork-url "http://localhost:8545" --silent
+#cat .gas-snapshot

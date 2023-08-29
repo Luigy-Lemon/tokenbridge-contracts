@@ -31,7 +31,7 @@ contract XDaiForeignBridgeTest is SetupTest {
     //////////////////////////////////////////////////////////////*/
 
     function testFuzzRefillBridge(uint256 minCashThreshold) public {
-        vm.assume(minCashThreshold > 0 );
+        vm.assume(minCashThreshold > 0);
         setMinCashThreshold(address(dai), minCashThreshold);
 
         uint256 initialBalance = dai.balanceOf(bridgeAddress);
@@ -299,13 +299,15 @@ contract XDaiForeignBridgeTest is SetupTest {
         assertEq(afterBalance, initialBalance + 1000 ether);
     }
     
-    function testPayInterestAndThenInvest() public {
+    function testPayInterestAndThenInvest(uint256 minCashThreshold) public {
 
-        skipTime(5 hours);
+        vm.assume(minCashThreshold > 100 ether);
+        setMinCashThreshold(address(dai), minCashThreshold);
+
         uint256 initialBalance = dai.balanceOf(bridgeAddress);
         uint256 initialInvested = bridge.investedAmount(address(dai));
         uint256 initialCollectable = bridge.interestAmount(address(dai));
-        console.log("%e %e",initialInvested,initialCollectable);
+
         assertGt(initialCollectable, bridge.minInterestPaid(address(dai)));
         bridge.payInterest(address(dai), 10000000 ether);
         uint256 duringBalance = dai.balanceOf(bridgeAddress);
